@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Move Bird with Loop Option</title>
+</head>
+<body>
+    <style>
+        body {
+            margin: 0;
+            background: #565279;
+        }
+
+        .outerWrapper {
+            width: 320px;
+            height: 250px;
+            position: relative;
+            overflow: hidden; /* Ensure the bird doesn't move outside the container */
+        }
+
+        .outerWrapper svg {
+            position: absolute;
+        }
+
+        .outerWrapper svg path {
+            fill: none; 
+            stroke: transparent;
+            stroke-width: 2; 
+            stroke-dasharray: 5, 5;
+        }
+    </style>
+
+    <div class="outerWrapper" id="outerWrapper">
+        <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+             width="100%" height="100%" viewBox="0 0 800 300">
+            <!-- Path for the bird to follow -->
+            <path id="birdPath" d="M6.99999 95C0.16085 84.1714 0.672425 65.6698 3.05554 53.5556C4.39339 46.7549 6.18934 39.9407 9.05554 33.6111C13.8033 23.1264 25.7535 15.5002 35.5555 10.2222C67.7036 -7.08825 108.052 1.34449 132 28.1667C145.334 43.1005 155.324 61.3726 168 77C180.916 92.924 196.153 101.973 216.556 105.556C238.725 109.449 262.007 106.921 281.611 95.6111C298.546 85.8409 309.021 69.5128 321.556 55.1111C333.259 41.6646 350.138 33.4793 364.556 23.4445C378.221 13.9335 393.103 10.3667 409.667 11.1111C421.853 11.6588 433.747 15.1208 444.722 20.3889C458.063 26.7926 472.708 35.1868 481.778 47.2222C496.904 67.2937 504.514 91.4595 524.444 107.778C540.447 120.88 559.84 124.053 579.611 119.944C601.65 115.365 624.477 109.767 642.833 96C656.469 85.7733 664.159 72.0543 675.556 60C679.641 55.6784 683.269 50.6638 687 46" stroke="white" stroke-linecap="round"/>
+            <!-- Bird image -->
+            <image id="birdImage" href="./Flying-Bird.gif" x="0" y="0" height="100px" width="100px"/>
+        </svg>
+
+        <script>
+            var loop = false; // Set to false if you don't want the animation to loop
+
+            function startAnimation(pathId, duration, direction) {
+                var startTime = null;
+                var birdPath = document.getElementById(pathId);
+                var birdImage = document.getElementById("birdImage");
+                var curveLength = birdPath.getTotalLength();
+
+                function moveBird(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var elapsedTime = timestamp - startTime;
+                    var progress = elapsedTime / duration;
+
+                    if (progress < 1) {
+                        var point;
+                        if (direction === "rightToLeft") {
+                            point = birdPath.getPointAtLength(curveLength - (progress * curveLength));
+                        } else {
+                            point = birdPath.getPointAtLength(progress * curveLength);
+                        }
+                        birdImage.setAttribute("x", point.x - 12.5); // Adjust to center the bird on the path
+                        birdImage.setAttribute("y", point.y - 12.5);
+                        requestAnimationFrame(moveBird);
+                    } else if (loop) {
+                        startTime = timestamp; // Reset startTime for looping
+                        requestAnimationFrame(moveBird);
+                    }
+                }
+
+                requestAnimationFrame(moveBird);
+            }
+
+            startAnimation("birdPath", 10000, "rightToLeft"); // Start animation for birdPath with 10s duration and left to right direction
+        </script>
+    </div>
+</body>
+</html>
